@@ -1,0 +1,38 @@
+method,target_species,catch_per_trip_kg,area_type,uses_bycatch_reduction,gear_type,enforcement_level,target_status,sustainable_practice,gear_impact_score,depth_m
+handline,Hamour,120,Nearshore Bahrain,yes,line,medium,vulnerable,0,2,30
+gillnet,Safi,250,Nearshore Bahrain,yes,net,medium,abundant,1,7,30
+trawling,Shrimp,900,Nearshore Bahrain,no,net,low,vulnerable,0,10,30
+purse seine,Sardine,700,Offshore Gulf,yes,net,medium,abundant,1,6,120
+traps,Crab,180,Nearshore Bahrain,yes,trap,medium,abundant,1,4,30
+handline,Kingfish,200,Offshore Gulf,yes,line,high,abundant,1,2,120
+gillnet,Sherri,450,Reef Area,no,net,low,vulnerable,0,7,20
+handline,Sherri,80,Nearshore Bahrain,yes,line,high,abundant,1,2,30
+handline,Hamour,500,Reef Area,no,line,low,vulnerable,0,2,20
+gillnet,Safi,320,Offshore Gulf,yes,net,medium,abundant,1,7,120
+gillnet,Safi,700,Reef Area,no,net,low,vulnerable,0,7,20
+traps,Crab,150,Nearshore Bahrain,yes,trap,high,abundant,1,4,30
+traps,Crab,600,Offshore Gulf,no,trap,low,abundant,0,4,120
+longline,Kingfish,200,Offshore Gulf,yes,line,medium,abundant,1,5,120
+longline,Kingfish,850,Reef Area,no,line,low,vulnerable,0,5,20
+purse seine,Sardine,900,Offshore Gulf,yes,net,medium,abundant,0,6,120
+purse seine,Sardine,400,Offshore Gulf,yes,net,high,abundant,1,6,120
+trawling,Shrimp,950,Nearshore Bahrain,no,net,low,vulnerable,0,10,30
+trawling,Shrimp,450,Offshore Gulf,yes,net,medium,abundant,1,10,120
+handline,Safi,60,Nearshore Bahrain,yes,line,high,abundant,1,2,30
+handline,Sherri,300,Reef Area,no,line,medium,vulnerable,0,2,20
+gillnet,Hamour,280,Offshore Gulf,yes,net,medium,vulnerable,0,7,120
+gillnet,Sherri,140,Nearshore Bahrain,yes,net,high,abundant,1,7,30
+traps,Lobster,220,Reef Area,yes,trap,medium,vulnerable,0,4,20
+longline,Tuna,700,Offshore Gulf,yes,line,high,abundant,1,5,120
+purse seine,Mackerel,600,Offshore Gulf,no,net,medium,abundant,0,6,120
+handline,Mixed Fish,150,Nearshore Bahrain,yes,line,high,abundant,1,2,30
+spearfishing,Zubaidi,30,Reef Area,no,line,high,abundant,1,0,20
+trolling,Kanaad,80,Offshore Gulf,yes,line,medium,abundant,1,2,120
+drift net,Mackerel,600,Offshore Gulf,no,net,low,vulnerable,0,8,120
+hand reel,Rabbitfish,40,Nearshore Bahrain,yes,line,high,abundant,1,1,30
+cage farming,Sea Bream,900,Offshore Gulf,no,net,medium,abundant,1,3,120
+bottom longline,Hamour,500,Reef Area,no,line,medium,vulnerable,0,6,20
+spearfishing,Emperor Bream,25,Reef Area,no,line,high,abundant,1,0,20
+fish trap,Crab,180,Nearshore Bahrain,yes,trap,medium,abundant,1,4,30
+trawling,Mixed Fish,1200,Offshore Gulf,no,net,low,vulnerable,0,10,120
+longline,Subaiti,400,Offshore Gulf,no,line,medium,abundant,1,5,120
