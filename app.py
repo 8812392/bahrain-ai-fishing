@@ -15,7 +15,7 @@ st.set_page_config(
 
 # ---------------- Title & Introduction ---------------- #
 
-st.title("AI Tool for Sustainable Fishing in Bahrain")
+st.title("AI Tool for Sustainable Fishing in Bahrain 🚨 UPDATED")
 
 st.write("""
 This website uses **artificial intelligence** to analyze fishing practices
