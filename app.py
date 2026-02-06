@@ -13,6 +13,31 @@ st.set_page_config(
     layout="centered",
 )
 
+# ---------------- Title & Introduction ---------------- #
+
+st.title("AI Tool for Sustainable Fishing in Bahrain")
+
+st.write("""
+This website uses **artificial intelligence** to analyze fishing practices
+and predict whether they are **sustainable** or **unsustainable**.
+
+The goal of this project is to raise awareness about responsible fishing
+and protect marine life in Bahrain.
+""")
+
+st.subheader("How to use this website")
+
+st.write("""
+1. Select the fishing method  
+2. Enter the fishing details  
+3. Click **Predict** to see the result
+""")
+
+st.info(
+    "Sustainable fishing helps protect fish populations, coral reefs, "
+    "and the future of fishing for the next generations."
+)
+
 # ---------------- Load data + model ---------------- #
 
 @st.cache_resource
