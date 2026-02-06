@@ -1,213 +1,114 @@
 import streamlit as st
 
-st.set_page_config(page_title="My Story", layout="wide")
+# Page configuration
+st.set_page_config(
+    page_title="My Story",
+    page_icon="🎣",
+    layout="wide"
+)
 
-# ---------- Styling (clean + premium) ----------
+# ---------- CUSTOM STYLING ----------
 st.markdown(
     """
     <style>
-      /* Wider readable text column */
-      .block-container { padding-top: 2.2rem; padding-bottom: 3rem; max-width: 1100px; }
-
-      /* Typography */
-      h1 { font-size: 3.0rem !important; margin-bottom: 0.4rem; }
-      h2 { font-size: 1.7rem !important; margin-top: 1.8rem; }
-      p, li { font-size: 1.08rem !important; line-height: 1.75 !important; }
-
-      /* Soft card sections */
-      .card {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 18px;
-        padding: 18px 18px;
-      }
-      .muted { opacity: 0.85; }
-      .highlight {
-        background: rgba(59, 130, 246, 0.13);
-        border: 1px solid rgba(59, 130, 246, 0.25);
-        border-radius: 14px;
-        padding: 14px 16px;
-      }
-      .tag {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,0.15);
-        margin-right: 8px;
-        margin-top: 8px;
-        font-size: 0.95rem;
-        opacity: 0.95;
-      }
+    .main-title {
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    .section-title {
+        font-size: 30px;
+        font-weight: 600;
+        margin-top: 40px;
+        margin-bottom: 15px;
+    }
+    .body-text {
+        font-size: 18px;
+        line-height: 1.7;
+        max-width: 900px;
+    }
     </style>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
-# ---------- Header ----------
-st.title("My Story")
-st.markdown(
-    """
-    <div class="muted">
-      Why I built this project — and what I learned along the way.
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+# ---------- TITLE ----------
+st.markdown('<div class="main-title">My Story</div>', unsafe_allow_html=True)
 
-st.write("")
+# ---------- LAYOUT ----------
+col1, col2 = st.columns([1, 1.3])
 
-# ---------- Top section: strong text + controlled image ----------
-left, right = st.columns([1.55, 1.0], vertical_alignment="top")
-
-with left:
-    st.markdown(
-        """
-        <div class="card">
-          <h2 style="margin-top:0;">A project I genuinely care about</h2>
-          <p>
-            In Bahrain, fishing isn’t just an industry — it’s a part of our culture and daily life.
-            Being close to the sea made me curious about what happens when fishing pressure increases,
-            or when certain gear or locations cause more harm than people realize.
-          </p>
-          <p>
-            I built this AI tool because I wanted to create something practical and easy to understand:
-            a simple way to explore whether a fishing practice is more likely to be <b>sustainable</b>
-            or <b>unsustainable</b> based on common factors (gear type, area sensitivity, bycatch reduction,
-            enforcement level, and catch size).
-          </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.write("")
-    st.markdown(
-        """
-        <div class="highlight">
-          <b>My goal:</b> raise awareness and encourage responsible fishing decisions —
-          while keeping the app educational, transparent, and easy to use.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with right:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    # Keep image visually present but not dominating:
-    # use_container_width=True in a narrower column gives a good size.
+with col1:
     st.image(
         "images/IMG_3395.JPG",
-        use_container_width=True,
-        caption="Me — building this as a Bahrain student project",
+        use_container_width=True
     )
+
+with col2:
     st.markdown(
         """
-        <div class="muted" style="margin-top:10px;">
-          Tip: if you ever change the image, keep it portrait-oriented for best fit.
+        <div class="body-text">
+        Fishing has always been more than just a hobby for me — it is something deeply connected
+        to my childhood, my family, and my environment. Growing up in Bahrain, the sea has always
+        been a constant presence in my life. From early mornings by the shore to long conversations
+        with experienced fishermen, I learned to respect the ocean and understand how closely our
+        lives are tied to it.
+
+        Over time, I began to notice a shift. Fish populations were changing, certain species were
+        becoming harder to find, and conversations started to include concerns about overfishing,
+        destructive gear, and unsustainable practices. This made me realize that fishing is not
+        just about catching fish — it is about responsibility.
+
+        This project represents my attempt to combine something I genuinely love with modern
+        technology to create awareness and encourage smarter choices. By using artificial
+        intelligence, data, and clear information, I wanted to build something that helps people
+        understand the difference between sustainable and unsustainable fishing — not in an
+        abstract way, but in a practical, real-world context.
         </div>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
-    st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------- What the project does ----------
+# ---------- WHAT THE APP DOES ----------
+st.markdown('<div class="section-title">What this app does</div>', unsafe_allow_html=True)
+
 st.markdown(
     """
-    <h2>What this app does (in plain language)</h2>
-    <div class="card">
-      <p>
-        The app takes a few fishing details and uses a machine-learning model trained on example practices
-        from Bahrain and the Gulf. It then predicts whether the combination of choices looks more like
-        a sustainable practice or an unsustainable one.
-      </p>
-      <p class="muted">
-        This is an educational project — it does not replace scientific assessments or government policy.
-        But it can still help people understand which factors usually increase risk.
-      </p>
+    <div class="body-text">
+    This application is designed to educate and assist users in understanding fishing practices
+    and their environmental impact. It uses an AI-powered system to analyze fishing methods, gear
+    types, species, and locations, and then provides insight into whether those practices are
+    sustainable or harmful to marine ecosystems.
+
+    Instead of relying on assumptions, the app focuses on data-driven reasoning. It highlights
+    why certain methods damage seabed habitats, increase bycatch, or threaten fish populations,
+    while also promoting techniques that allow marine life to recover and remain balanced.
+
+    The goal is not to judge fishermen, but to empower better decision-making — whether the user
+    is a student, recreational fisher, or someone simply interested in ocean conservation.
     </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
-# ---------- Why AI helps / what you learned ----------
-st.markdown("<h2>Why I chose AI for this</h2>", unsafe_allow_html=True)
-c1, c2 = st.columns(2, vertical_alignment="top")
+# ---------- WHY THIS PROJECT MATTERS ----------
+st.markdown('<div class="section-title">Why this project matters</div>', unsafe_allow_html=True)
 
-with c1:
-    st.markdown(
-        """
-        <div class="card">
-          <p><b>1) It makes trade-offs visible.</b></p>
-          <ul>
-            <li>Some gear types are lower-impact than others.</li>
-            <li>Some areas are more sensitive and need extra protection.</li>
-            <li>Catch size and enforcement can change the sustainability outcome.</li>
-          </ul>
-          <p class="muted">
-            AI helps combine these factors into one clear prediction people can discuss.
-          </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with c2:
-    st.markdown(
-        """
-        <div class="card">
-          <p><b>2) It taught me real skills.</b></p>
-          <ul>
-            <li>Data cleaning and preparing features for training</li>
-            <li>Training and evaluating a model (and understanding accuracy limits)</li>
-            <li>Building a clean user experience with Streamlit</li>
-            <li>Deploying and maintaining a live web app</li>
-          </ul>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-# ---------- Transparency / limitations (important for “serious” feel) ----------
-st.markdown("<h2>Honesty & limitations</h2>", unsafe_allow_html=True)
 st.markdown(
     """
-    <div class="card">
-      <p>
-        Any AI model is only as good as the examples it learns from.
-        This classifier is meant to educate and support discussion — not to make official decisions.
-      </p>
-      <ul>
-        <li><b>Training data is limited</b>: more real-world observations would improve reliability.</li>
-        <li><b>Context matters</b>: seasonality, protected zones, and species health can change outcomes.</li>
-        <li><b>Prediction ≠ truth</b>: it estimates likelihood based on patterns in sample data.</li>
-      </ul>
-      <p class="muted">
-        I included this section because transparency is part of responsible AI.
-      </p>
+    <div class="body-text">
+    Bahrain’s marine environment is fragile and extremely important to our culture, economy, and
+    food security. Unsustainable fishing practices may not show immediate consequences, but their
+    long-term effects can permanently damage ecosystems.
+
+    By creating this project, I wanted to show how technology can be used as a tool for
+    environmental responsibility. This app demonstrates that artificial intelligence is not only
+    about automation or convenience — it can also support sustainability, awareness, and future
+    planning.
+
+    This project reflects both my personal values and my learning journey. It challenged me to
+    research deeply, think critically, and design something meaningful rather than superficial.
     </div>
     """,
-    unsafe_allow_html=True,
-)
-
-# ---------- Closing (strong finish) ----------
-st.markdown("<h2>What I hope people take from this</h2>", unsafe_allow_html=True)
-st.markdown(
-    """
-    <div class="card">
-      <p>
-        I want this project to make sustainability feel <b>clear</b> and <b>actionable</b>.
-        Even small changes — choosing lower-impact gear, reducing bycatch, respecting sensitive areas —
-        can help protect fish stocks and coral reefs over time.
-      </p>
-      <p>
-        Bahrain’s sea is part of who we are. This is my way of using technology to protect it.
-      </p>
-
-      <div class="tag">🇧🇭 Bahrain</div>
-      <div class="tag">🌊 Marine life</div>
-      <div class="tag">🤖 Responsible AI</div>
-      <div class="tag">🎣 Sustainable fishing</div>
-    </div>
-    """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
