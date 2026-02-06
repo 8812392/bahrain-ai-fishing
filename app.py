@@ -1,452 +1,432 @@
-import streamlit as st
-import pandas as pd
+import os
 import numpy as np
+import pandas as pd
+import streamlit as st
 
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
 
 
-# ---------------- Theme: Bright Ocean (not gloomy) ----------------
-def apply_theme():
+# -----------------------------
+# PAGE CONFIG
+# -----------------------------
+st.set_page_config(
+    page_title="Bahrain Sustainable Fishing Classifier",
+    page_icon="🌊",
+    layout="wide",
+)
+
+
+# -----------------------------
+# OCEAN THEME (LIGHT, PREMIUM)
+# -----------------------------
+st.markdown(
+    """
+<style>
+/* Global background */
+.stApp {
+    background: linear-gradient(180deg, #f6fcff 0%, #e9f7ff 100%);
+    color: #0f2a44;
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #0f3d5e;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* Body text */
+p, li, label {
+    font-size: 1.05rem !important;
+    line-height: 1.75 !important;
+    color: #123a57 !important;
+}
+
+/* Card container */
+.card {
+    background: #ffffff;
+    padding: 1.6rem 1.6rem;
+    border-radius: 18px;
+    margin: 0.8rem 0 1.2rem 0;
+    box-shadow: 0 10px 28px rgba(15, 61, 94, 0.08);
+    border: 1px solid rgba(34, 122, 173, 0.10);
+}
+
+/* Accent top border */
+.card-accent {
+    border-top: 5px solid #46b3e6;
+}
+
+/* Smaller muted text */
+.muted {
+    color: rgba(18,58,87,0.75) !important;
+    font-size: 0.98rem !important;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: #e9f7ff !important;
+    border-right: 1px solid rgba(34, 122, 173, 0.12);
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(90deg, #46b3e6, #2aa7cf) !important;
+    color: white !important;
+    border-radius: 12px !important;
+    padding: 0.65rem 1.15rem !important;
+    font-weight: 700 !important;
+    border: none !important;
+    box-shadow: 0 10px 20px rgba(42,167,207,0.18) !important;
+}
+.stButton > button:hover {
+    background: linear-gradient(90deg, #2aa7cf, #1a92c2) !important;
+    transform: translateY(-1px);
+}
+
+/* Inputs */
+div[data-baseweb="select"] > div,
+.stTextInput input,
+.stNumberInput input {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(34, 122, 173, 0.18) !important;
+}
+
+/* Sliders */
+div[role="slider"] {
+    color: #2aa7cf !important;
+}
+
+/* Metric blocks */
+div[data-testid="stMetric"] {
+    background: white;
+    border-radius: 14px;
+    padding: 0.8rem;
+    border: 1px solid rgba(34, 122, 173, 0.10);
+    box-shadow: 0 8px 22px rgba(15, 61, 94, 0.06);
+}
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+
+# -----------------------------
+# HELPERS
+# -----------------------------
+def card(title: str, body_html: str, accent: bool = True):
+    cls = "card card-accent" if accent else "card"
     st.markdown(
-        """
-        <style>
-          :root{
-            --bg:#f6fbff;
-            --text:#0f172a;
-            --muted:#475569;
-            --card:#ffffff;
-            --border:#d9e8f5;
-            --shadow:rgba(15,23,42,0.06);
-            --blue:#0ea5e9;
-            --teal:#14b8a6;
-            --soft:#e8f6ff;
-            --danger:#ef4444;
-          }
-
-          html, body, [class*="css"]{
-            background-color:var(--bg);
-            color:var(--text);
-          }
-
-          .block-container{
-            padding-top:2.0rem;
-            padding-bottom:3rem;
-            max-width:1150px;
-          }
-
-          h1{ font-size:3.0rem !important; margin-bottom:0.2rem; }
-          h2{ font-size:1.55rem !important; margin-top:1.2rem; }
-          p, li{ font-size:1.06rem !important; line-height:1.75 !important; }
-
-          .hero{
-            background:linear-gradient(135deg, rgba(14,165,233,0.13), rgba(20,184,166,0.11));
-            border:1px solid var(--border);
-            border-radius:22px;
-            padding:18px 18px;
-            box-shadow:0 10px 28px var(--shadow);
-          }
-
-          .subtle{ color:var(--muted); font-size:1.05rem; }
-
-          .card{
-            background:var(--card);
-            border:1px solid var(--border);
-            border-radius:18px;
-            padding:18px 18px;
-            box-shadow:0 10px 28px var(--shadow);
-          }
-
-          .pill{
-            display:inline-block;
-            padding:6px 10px;
-            border-radius:999px;
-            border:1px solid var(--border);
-            background:#fff;
-            margin-right:8px;
-            margin-top:8px;
-            font-size:0.95rem;
-            color:var(--text);
-          }
-
-          .resultGood{
-            background:rgba(20,184,166,0.12);
-            border:1px solid rgba(20,184,166,0.28);
-            border-radius:16px;
-            padding:14px 14px;
-          }
-
-          .resultBad{
-            background:rgba(239,68,68,0.10);
-            border:1px solid rgba(239,68,68,0.22);
-            border-radius:16px;
-            padding:14px 14px;
-          }
-
-          .tiny{ color:var(--muted); font-size:0.95rem; }
-          .divider{ height:1px; background:var(--border); margin:12px 0; }
-
-          .recBox{
-            background: rgba(14,165,233,0.08);
-            border: 1px solid rgba(14,165,233,0.22);
-            border-radius: 16px;
-            padding: 14px 14px;
-          }
-        </style>
-        """,
+        f"""
+<div class="{cls}">
+  <h3 style="margin: 0 0 0.6rem 0;">{title}</h3>
+  {body_html}
+</div>
+""",
         unsafe_allow_html=True,
     )
 
 
-# ---------------- Helpers (Top-tier upgrades) ----------------
-def pretty_label(col: str) -> str:
-    """Make dataset column names look human-friendly."""
-    s = col.strip().replace("_", " ")
-    s = " ".join(s.split())
-    # Small title-case improvements
-    titled = s.title()
-    titled = titled.replace("Kg", "kg").replace("Ai", "AI").replace("Id", "ID")
-    titled = titled.replace("Mun", "MUN")
-    return titled
+@st.cache_data(show_spinner=False)
+def load_data(csv_path: str) -> pd.DataFrame:
+    return pd.read_csv(csv_path)
 
 
-def norm_key(s: str) -> str:
-    return s.lower().strip().replace(" ", "_")
-
-
-def get_value(user_input: dict, candidates: list[str]):
-    """Find a value in user_input using flexible matching."""
-    # Build normalized map
-    m = {norm_key(k): user_input.get(k) for k in user_input.keys()}
-    for c in candidates:
-        ck = norm_key(c)
-        # exact match by normalized
-        if ck in m:
-            return m[ck]
-        # fuzzy: contains
-        for k in m:
-            if ck == k or ck in k or k in ck:
-                return m[k]
+def pick_first_existing_column(df: pd.DataFrame, candidates: list[str]) -> str | None:
+    cols_lower = {c.lower(): c for c in df.columns}
+    for cand in candidates:
+        if cand.lower() in cols_lower:
+            return cols_lower[cand.lower()]
     return None
 
 
-def confidence_from_probs(probs: np.ndarray) -> tuple[str, float]:
-    """
-    Confidence based on probability margin between top two classes.
-    Returns (label, margin)
-    """
-    if probs is None or len(probs) < 2:
-        return ("Unknown", 0.0)
-    sorted_probs = sorted([float(p) for p in probs], reverse=True)
-    margin = sorted_probs[0] - sorted_probs[1]
-    # thresholds tuned for “student project” clarity
-    if margin >= 0.35:
-        return ("High", margin)
-    if margin >= 0.18:
-        return ("Medium", margin)
-    return ("Low", margin)
-
-
-def build_recommendations(user_input: dict) -> list[str]:
-    recs = []
-
-    gear = get_value(user_input, ["gear", "gear_type", "method", "fishing_method"])
-    enforcement = get_value(user_input, ["enforcement", "enforcement_level", "law_enforcement"])
-    bycatch = get_value(user_input, ["bycatch_reduction", "bycatch", "bycatch_reduction_level"])
-    catchkg = get_value(user_input, ["catch_per_trip_kg", "catch per trip kg", "catch_per_trip"])
-    depth = get_value(user_input, ["depth", "depth_m", "depth (m)"])
-    gear_impact = get_value(user_input, ["gear_impact_score", "gear impact score"])
-
-    gear_s = str(gear).lower() if gear is not None else ""
-    enf_s = str(enforcement).lower() if enforcement is not None else ""
-    byc_s = str(bycatch).lower() if bycatch is not None else ""
-
-    # 1) Gear/method suggestions
-    high_impact_keywords = ["trawl", "trawling", "dredge", "dredging", "drift net", "driftnet", "gillnet"]
-    low_impact_alts = "switch to handline, hook-and-line, hand reel, or well-managed traps (where legal)"
-
-    if any(k in gear_s for k in high_impact_keywords):
-        recs.append("Consider using a lower-impact fishing method (example: " + low_impact_alts + ").")
-
-    if "illegal" in enf_s:
-        recs.append("Your enforcement level is marked as illegal — a key improvement is to follow legal regulations and permitted gear only.")
-    elif "low" in enf_s:
-        recs.append("If possible, improve compliance: fishing in regulated zones with stronger monitoring often reduces sustainability risk.")
-
-    # 2) Bycatch reduction
-    if byc_s in ["none", "low", "very low", "0", "no"]:
-        recs.append("Increase bycatch reduction (example: selective hook sizes, circle hooks, escape gaps in traps, avoiding juvenile areas).")
-
-    # 3) Catch size pressure
-    if catchkg is not None:
-        try:
-            ck = float(catchkg)
-            if ck >= 700:
-                recs.append("Catch per trip is very high — reducing catch size or fishing frequency can lower pressure on fish populations.")
-            elif ck >= 450:
-                recs.append("Consider moderating catch per trip and prioritizing legal size limits to reduce long-term pressure.")
-        except Exception:
-            pass
-
-    # 4) Depth / habitat sensitivity
-    if depth is not None:
-        d = str(depth).lower()
-        if any(x in d for x in ["near", "nearshore", "seagrass", "reef"]):
-            recs.append("Nearshore habitats can be more sensitive — avoid reefs/seagrass zones and respect protected areas if applicable.")
-
-    # 5) Gear impact score (if you added it)
-    if gear_impact is not None:
-        try:
-            gi = float(gear_impact)
-            if gi >= 8:
-                recs.append("Your gear impact score is high — choose more selective gear or fish in less sensitive areas to reduce habitat damage.")
-        except Exception:
-            pass
-
-    # If nothing triggered, still show something useful
-    if not recs:
-        recs.append("Your scenario already looks relatively responsible — keep focusing on selective gear, reduced bycatch, and respecting sensitive areas.")
-
-    return recs
-
-
-# ---------------- Data + Model ----------------
-@st.cache_data
-def load_data(path: str) -> pd.DataFrame:
-    df = pd.read_csv(path)
-    df.columns = [c.strip() for c in df.columns]
-    return df
-
-
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def train_model(df: pd.DataFrame):
-    possible_labels = ["label", "sustainable", "is_sustainable", "target", "class"]
-    label_col = None
-    for c in possible_labels:
-        if c in df.columns:
-            label_col = c
-            break
-    if label_col is None:
-        label_col = df.columns[-1]
+    """
+    Trains a simple, robust baseline model.
+    Detects columns based on common names.
+    """
+    # Try to detect target column (label)
+    target_col = pick_first_existing_column(
+        df,
+        [
+            "label",
+            "sustainability",
+            "sustainable",
+            "is_sustainable",
+            "result",
+            "target",
+            "y",
+            "class",
+        ],
+    )
 
-    X = df.drop(columns=[label_col])
-    y = df[label_col]
+    if target_col is None:
+        return None, None, None, None, (
+            "Couldn't find the target/label column in your CSV.\n\n"
+            "Expected something like: label, sustainable, sustainability, is_sustainable, result."
+        )
 
-    numeric_features = X.select_dtypes(include=["int64", "float64", "int32", "float32"]).columns.tolist()
-    categorical_features = [c for c in X.columns if c not in numeric_features]
+    # Detect feature columns (common names)
+    feature_map = {
+        "fishing_method": ["fishing_method", "method", "gear_method", "fishing type"],
+        "target_species": ["target_species", "species", "target", "fish_species"],
+        "area_type": ["area_type", "area", "zone", "location_type"],
+        "gear_type": ["gear_type", "gear", "tool"],
+        "bycatch_reduction": ["bycatch_reduction", "bycatch_device", "uses_bycatch_devices", "bycatch"],
+        "enforcement_level": ["enforcement_level", "enforcement", "regulation", "compliance"],
+        "catch_per_trip_kg": ["catch_per_trip_kg", "catch_per_trip", "catch_kg", "catch"],
+        "target_status": ["target_status", "status", "stock_status"],
+    }
 
-    preprocessor = ColumnTransformer(
+    resolved = {}
+    for key, candidates in feature_map.items():
+        col = pick_first_existing_column(df, candidates)
+        if col is not None:
+            resolved[key] = col
+
+    # Require a minimum set (so model makes sense)
+    required_keys = ["fishing_method", "target_species", "area_type", "gear_type", "enforcement_level"]
+    missing_required = [k for k in required_keys if k not in resolved]
+
+    if missing_required:
+        return None, None, None, None, (
+            "Your CSV is missing some expected feature columns.\n\n"
+            f"Missing: {missing_required}\n\n"
+            f"Found columns: {list(df.columns)}"
+        )
+
+    # Build X/y
+    used_feature_cols = list(resolved.values())
+    work = df[used_feature_cols + [target_col]].dropna().copy()
+
+    X = work[used_feature_cols]
+    y = work[target_col]
+
+    # If y is strings, keep it; logistic regression can handle with encoding via label? sklearn expects 1d. We'll keep.
+    # Split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y if y.nunique() > 1 else None
+    )
+
+    # Identify types
+    cat_cols = []
+    num_cols = []
+    for c in X.columns:
+        if pd.api.types.is_numeric_dtype(X[c]):
+            num_cols.append(c)
+        else:
+            cat_cols.append(c)
+
+    pre = ColumnTransformer(
         transformers=[
-            ("cat", OneHotEncoder(handle_unknown="ignore"), categorical_features),
-            ("num", "passthrough", numeric_features),
+            ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols),
+            ("num", "passthrough", num_cols),
         ]
     )
 
-    model = RandomForestClassifier(
-        n_estimators=450,
-        random_state=42,
-        class_weight="balanced",
-    )
-
-    pipe = Pipeline(steps=[("prep", preprocessor), ("model", model)])
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.22, random_state=42,
-        stratify=y if y.nunique() > 1 else None
-    )
+    clf = LogisticRegression(max_iter=2000)
+    pipe = Pipeline([("pre", pre), ("clf", clf)])
 
     pipe.fit(X_train, y_train)
+    preds = pipe.predict(X_test)
+    acc = accuracy_score(y_test, preds)
 
-    acc = 0.0
-    if len(X_test) > 0:
-        preds = pipe.predict(X_test)
-        acc = float(accuracy_score(y_test, preds))
+    # Build "choices" lists for UI
+    choices = {}
+    for key, col in resolved.items():
+        if col in cat_cols:
+            vals = sorted(work[col].astype(str).unique().tolist())
+            choices[key] = vals
+        else:
+            # numeric
+            choices[key] = {
+                "min": float(np.nanmin(work[col])),
+                "max": float(np.nanmax(work[col])),
+                "median": float(np.nanmedian(work[col])),
+            }
 
-    classes = list(pipe.named_steps["model"].classes_)
-    return pipe, acc, label_col, X.columns.tolist(), numeric_features, categorical_features, classes
+    return pipe, resolved, choices, acc, None
 
 
-def safe_default(df: pd.DataFrame, col: str):
-    if df[col].dtype.kind in "if":
-        return float(df[col].median())
-    mode = df[col].mode()
-    return str(mode.iloc[0]) if len(mode) else ""
+# -----------------------------
+# LOAD + TRAIN
+# -----------------------------
+CSV_PATH = "bahrain_fishing_practices.csv"
+if not os.path.exists(CSV_PATH):
+    st.error(f"Can't find `{CSV_PATH}` in the repo root. Upload it next to `app.py`.")
+    st.stop()
 
+df = load_data(CSV_PATH)
+model, resolved_cols, choices, test_acc, train_error = train_model(df)
 
-# ---------------- App ----------------
-st.set_page_config(page_title="Bahrain Sustainable Fishing AI", page_icon="🌊", layout="wide")
-apply_theme()
+# -----------------------------
+# HERO
+# -----------------------------
+left, right = st.columns([1.4, 1.0], gap="large")
 
-df = load_data("bahrain_fishing_practices.csv")
-pipe, acc, label_col, feature_cols, num_cols, cat_cols, classes = train_model(df)
+with left:
+    st.markdown("<h1>AI Tool for Sustainable Fishing in Bahrain</h1>", unsafe_allow_html=True)
+    st.markdown(
+        """
+<p class="muted" style="margin-top: -0.2rem;">
+This app uses a simple machine-learning model trained on example fishing practices from Bahrain and the Gulf
+to estimate whether a practice is more likely <b>sustainable</b> or <b>unsustainable</b>.
+</p>
+""",
+        unsafe_allow_html=True,
+    )
 
-st.markdown(
+with right:
+    if test_acc is not None:
+        st.metric("Current test accuracy", f"{test_acc*100:.1f}%")
+    else:
+        st.metric("Current test accuracy", "—")
+
+# -----------------------------
+# INTRO + HOW TO USE
+# -----------------------------
+card(
+    "How to use this website",
     """
-    <div class="hero">
-      <h1>🌊 Bahrain Sustainable Fishing AI</h1>
-      <div class="subtle">
-        An educational tool that predicts whether a fishing scenario is more likely to be sustainable — with a score, confidence, and improvement tips.
-      </div>
-      <div style="margin-top:10px;">
-        <span class="pill">🇧🇭 Bahrain</span>
-        <span class="pill">🎣 Fishing</span>
-        <span class="pill">🤖 AI</span>
-        <span class="pill">🪸 Marine protection</span>
-      </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
+<ol style="margin: 0.2rem 0 0 1.1rem;">
+  <li>Select the fishing method and details below</li>
+  <li>Click <b>Check sustainability</b></li>
+  <li>Use the result as an educational guide</li>
+</ol>
+<p class="muted" style="margin-top: 0.9rem;">
+This is an educational project, not an official scientific tool.
+</p>
+""",
 )
 
-st.write("")
-left, right = st.columns([1.05, 0.95], vertical_alignment="top")
-
-
-# ---------------- Inputs (prettified labels + no underscores) ----------------
-with left:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.subheader("Build a fishing scenario")
-
-    user_input = {}
-    for col in feature_cols:
-        label = pretty_label(col)
-        default = safe_default(df, col)
-
-        if col in num_cols:
-            # Your requested range for catch per trip
-            if norm_key(col) in ["catch_per_trip_kg", "catch_per_trip_(kg)", "catchpertripkg", "catch_per_trip"]:
-                user_input[col] = st.slider(label, min_value=20, max_value=1000,
-                                            value=int(default) if default else 200, key=col)
-            else:
-                mn = float(df[col].min())
-                mx = float(df[col].max())
-                if np.isfinite(mn) and np.isfinite(mx) and mn != mx:
-                    val = float(default) if default is not None else mn
-                    user_input[col] = st.slider(label, float(mn), float(mx), float(val), key=col)
-                else:
-                    user_input[col] = st.number_input(label, value=float(default) if default else 0.0, key=col)
-
-        else:
-            options = sorted(df[col].dropna().astype(str).unique().tolist())
-            idx = options.index(str(default)) if str(default) in options else 0
-            user_input[col] = st.selectbox(label, options, index=idx, key=col)
-
-    run = st.button("Predict sustainability", type="primary")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-# ---------------- Output (score + confidence + recommendations) ----------------
-with right:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.subheader("Result")
-
-    st.markdown(
-        f"<div class='tiny'>Model test accuracy (quick split): <b>{acc*100:.1f}%</b></div>",
-        unsafe_allow_html=True
+# If training had an error, show it clearly and stop
+if train_error:
+    card(
+        "Setup issue (CSV columns)",
+        f"""
+<p>{train_error.replace("\n","<br>")}</p>
+<p class="muted" style="margin-top:0.8rem;">
+If you want, send me a screenshot of your CSV column headers (top row) and I’ll align the app perfectly to your dataset.
+</p>
+""",
+        accent=False,
     )
-    st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+    st.stop()
 
-    if run:
-        X_new = pd.DataFrame([user_input], columns=feature_cols)
+# -----------------------------
+# CLASSIFIER UI
+# -----------------------------
+card(
+    "Step 1 — Describe the fishing practice",
+    "<p class='muted' style='margin-top:-0.3rem;'>Choose realistic values to get the most meaningful prediction.</p>",
+)
 
-        probs = None
-        proba_sus = None
-        if hasattr(pipe, "predict_proba") and len(classes) > 1:
-            probs = pipe.predict_proba(X_new)[0]
+c1, c2 = st.columns(2, gap="large")
 
-            # Try to detect which class means “sustainable”
-            sus_idx = None
-            for i, c in enumerate(classes):
-                if str(c).lower() in ["sustainable", "1", "true", "yes"]:
-                    sus_idx = i
-                    break
-            if sus_idx is None:
-                sus_idx = 1  # fallback
-            proba_sus = float(probs[sus_idx])
+with c1:
+    fishing_method = st.selectbox("Fishing method", choices["fishing_method"], index=0)
+    area_type = st.selectbox("Area type", choices["area_type"], index=0)
+    bycatch = None
+    if "bycatch_reduction" in choices and isinstance(choices["bycatch_reduction"], list):
+        bycatch = st.selectbox("Uses bycatch reduction devices?", choices["bycatch_reduction"], index=0)
 
-        pred = pipe.predict(X_new)[0]
-        pred_str = str(pred).lower()
-        is_sus = pred_str in ["sustainable", "1", "true", "yes"]
+with c2:
+    target_species = st.selectbox("Target species", choices["target_species"], index=0)
+    gear_type = st.selectbox("Gear type", choices["gear_type"], index=0)
+    enforcement_level = st.selectbox("Enforcement level", choices["enforcement_level"], index=0)
 
-        # Confidence
-        conf_label, margin = confidence_from_probs(probs)
+catch_per_trip = None
+if "catch_per_trip_kg" in choices and isinstance(choices["catch_per_trip_kg"], dict):
+    rng = choices["catch_per_trip_kg"]
+    # make slider nice (and not extreme)
+    low = max(0.0, rng["min"])
+    high = max(low + 1.0, rng["max"])
+    default = float(np.clip(rng["median"], low, high))
+    catch_per_trip = st.slider("Catch per trip (kg)", float(low), float(high), float(default))
 
-        # Score output
-        if proba_sus is None:
-            if is_sus:
-                st.markdown("<div class='resultGood'><h3>✅ Likely Sustainable</h3></div>", unsafe_allow_html=True)
-            else:
-                st.markdown("<div class='resultBad'><h3>⚠️ Likely Unsustainable</h3></div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='tiny'><b>Confidence:</b> {conf_label}</div>", unsafe_allow_html=True)
+target_status = None
+if "target_status" in choices and isinstance(choices["target_status"], list):
+    target_status = st.selectbox("Status of target species", choices["target_status"], index=0)
 
-        else:
-            sus_pct = int(round(proba_sus * 100))
-            risk_pct = 100 - sus_pct
+card(
+    "Step 2 — Check sustainability",
+    "<p class='muted' style='margin-top:-0.3rem;'>The prediction is based on patterns in the example dataset used for training.</p>",
+)
 
-            if sus_pct >= 60:
-                st.markdown(
-                    f"<div class='resultGood'><h3>✅ Sustainability Score: {sus_pct}%</h3>"
-                    f"<div class='tiny'>Risk Score: {risk_pct}% • <b>Confidence:</b> {conf_label}</div></div>",
-                    unsafe_allow_html=True
-                )
-            else:
-                st.markdown(
-                    f"<div class='resultBad'><h3>⚠️ Sustainability Score: {sus_pct}%</h3>"
-                    f"<div class='tiny'>Risk Score: {risk_pct}% • <b>Confidence:</b> {conf_label}</div></div>",
-                    unsafe_allow_html=True
-                )
+# Assemble input row based on resolved columns
+def build_input_row():
+    row = {}
+    # required
+    row[resolved_cols["fishing_method"]] = fishing_method
+    row[resolved_cols["target_species"]] = target_species
+    row[resolved_cols["area_type"]] = area_type
+    row[resolved_cols["gear_type"]] = gear_type
+    row[resolved_cols["enforcement_level"]] = enforcement_level
 
-            st.progress(sus_pct / 100)
+    # optional
+    if "bycatch_reduction" in resolved_cols and bycatch is not None:
+        row[resolved_cols["bycatch_reduction"]] = bycatch
+    if "catch_per_trip_kg" in resolved_cols and catch_per_trip is not None:
+        row[resolved_cols["catch_per_trip_kg"]] = catch_per_trip
+    if "target_status" in resolved_cols and target_status is not None:
+        row[resolved_cols["target_status"]] = target_status
 
-            # Confidence explanation (simple and honest)
-            st.markdown(
-                f"<div class='tiny'>Confidence is based on how clearly the model preferred one class over another (probability gap ≈ {margin:.2f}).</div>",
-                unsafe_allow_html=True
-            )
+    return pd.DataFrame([row])
 
-        st.write("")
-        st.markdown("**How to interpret the result**")
-        st.markdown(
-            """
-            - Higher-impact gear usually increases risk  
-            - Sensitive habitats increase risk  
-            - Better enforcement and bycatch reduction lowers risk  
-            - Very high catch sizes can increase pressure on fish populations  
-            """.strip()
-        )
 
-        st.write("")
-        st.markdown("**Recommendations to improve sustainability**")
-        recs = build_recommendations(user_input)
-        st.markdown("<div class='recBox'>", unsafe_allow_html=True)
-        for r in recs:
-            st.markdown(f"- {r}")
-        st.markdown("</div>", unsafe_allow_html=True)
+btn = st.button("✅ Check sustainability")
 
-        st.write("")
-        st.markdown(
-            "<div class='tiny'>Educational note: this is a student model trained on sample data. It helps learning and discussion, not official decisions.</div>",
-            unsafe_allow_html=True
-        )
+if btn:
+    x_in = build_input_row()
+    pred = model.predict(x_in)[0]
 
+    proba = None
+    try:
+        probs = model.predict_proba(x_in)[0]
+        # if binary, show max probability as confidence
+        proba = float(np.max(probs))
+    except Exception:
+        proba = None
+
+    # Style result
+    if str(pred).strip().lower() in ["sustainable", "1", "true", "yes"]:
+        headline = "✅ Likely Sustainable"
+        detail = "Based on the training data patterns, this looks more aligned with sustainable practices."
     else:
-        st.markdown(
-            "<div class='tiny'>Fill the scenario on the left and click <b>Predict sustainability</b>.</div>",
-            unsafe_allow_html=True
-        )
+        headline = "⚠️ Likely Unsustainable"
+        detail = "Based on the training data patterns, this looks more aligned with unsustainable practices."
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    card(
+        headline,
+        f"""
+<p style="font-size:1.12rem; margin-top:-0.2rem;"><b>Prediction:</b> {pred}</p>
+<p>{detail}</p>
+{"<p class='muted'><b>Confidence:</b> " + f"{proba*100:.1f}%" + "</p>" if proba is not None else ""}
+""",
+        accent=True,
+    )
 
-st.write("")
+with st.expander("How does this AI work?"):
+    st.markdown(
+        """
+- The app learns from examples in the CSV (past fishing practices + a label).
+- It converts text choices (like “bottom longline”) into numeric features.
+- A simple classifier learns patterns that correlate with sustainable vs unsustainable outcomes.
+- Your input is compared to those learned patterns to make a prediction.
+
+**Note:** Accuracy depends heavily on the size and quality of the training dataset.
+"""
+    )
+
 st.markdown(
-    """
-    <div class="card">
-      <b>Tip:</b> Use the sidebar to open <b>My Story</b> for the personal meaning behind this project.
-    </div>
-    """,
-    unsafe_allow_html=True
+    "<div class='muted' style='text-align:center; margin-top:1.2rem;'>Project by a Bahrain student using Python, scikit-learn and Streamlit 🌊</div>",
+    unsafe_allow_html=True,
 )
