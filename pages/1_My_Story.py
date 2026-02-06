@@ -19,3 +19,11 @@ st.info(
     "This page is personal, but the message is shared: "
     "protecting the sea means protecting our future."
 )
+
+import streamlit as st
+
+st.title("My Story")
+
+st.write("If you see my photo below, the image path is working ✅")
+
+st.image("images/IMG_3395.JPG", use_container_width=True)
