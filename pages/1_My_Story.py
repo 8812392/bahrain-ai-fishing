@@ -97,10 +97,7 @@ with col1:
 
     if os.path.exists(IMG_PATH):
         st.image(IMG_PATH, use_container_width=True)
-        st.markdown(
-            '<p class="muted" style="margin-top:10px;">If you ever replace this image, portrait orientation works best.</p>',
-            unsafe_allow_html=True,
-        )
+        # ✅ Removed the “portrait orientation works best” message
     else:
         st.info("No image found yet. Add your photo to: images/IMG_3395.JPG (exact name).")
 
@@ -135,18 +132,25 @@ with col2:
     )
 
 st.write("")
+
+# ✅ Replaced “What I’m aiming for next” with a non-repetitive, higher-quality section
 st.markdown(
     """
 <div class="card">
-  <h2 class="section-title">What I’m aiming for next</h2>
+  <h2 class="section-title">How this project was designed</h2>
+  <p>
+    I built this to be clear and educational — not complicated for the sake of it. The goal is that anyone can use it,
+    understand the inputs, and learn something from the result.
+  </p>
   <ul>
-    <li>More Bahrain-specific data and clearer labeling guidelines</li>
-    <li>Better transparency about why the model predicted a result</li>
-    <li>More educational content and visuals on sustainable practices</li>
+    <li><b>Simple inputs:</b> The fields are based on real fishing decisions (method, gear, enforcement, catch size).</li>
+    <li><b>Interpretable approach:</b> I chose a straightforward model so the logic is easier to explain and improve.</li>
+    <li><b>Ocean-first UI:</b> The design is intentionally clean and calm to keep attention on the message and learning.</li>
   </ul>
   <p class="muted">Thank you for taking this seriously — it genuinely matters.</p>
 </div>
 """,
     unsafe_allow_html=True,
 )
+
 st.markdown("</div>", unsafe_allow_html=True)
