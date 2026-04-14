@@ -416,11 +416,12 @@ st.markdown('<div class="container">', unsafe_allow_html=True)
 st.markdown(
     """
 <div class="hero">
-  <h1>AI Tool for Sustainable Fishing in Bahrain 🇧🇭</h1>
-  <p>
-    An educational Streamlit app that uses a simple machine-learning model trained on example fishing practices
-    from Bahrain and the Gulf to predict whether a practice is more likely <b>sustainable</b> or <b>unsustainable</b>.
-  </p>
+<h1>SMART SEAS</h1>
+<p>
+  AI Tool for Sustainable Fishing in Bahrain 🇧🇭 — an educational Streamlit app that uses a simple machine-learning model
+  trained on example fishing practices from Bahrain and the Gulf to predict whether a practice is more likely
+  <b>sustainable</b> or <b>unsustainable</b>.
+</p>
   <div class="badges">
     <span class="badge">🌊 Ocean-themed UI</span>
     <span class="badge">🤖 ML classifier</span>
