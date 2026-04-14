@@ -17,8 +17,7 @@ from sklearn.linear_model import LogisticRegression
 # Page config
 # =========================
 st.set_page_config(
-    page_title="Bahrain Sustainable Fishing Classifier",
-    page_icon="🇧🇭",
+    page_title="SMART SEAS"
     layout="wide",
 )
 
