@@ -17,7 +17,7 @@ from sklearn.linear_model import LogisticRegression
 # Page config
 # =========================
 st.set_page_config(
-    page_title="SMART SEAS"
+    page_title="SMART SEAS",
     layout="wide",
 )
 
