@@ -235,6 +235,7 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
         "Status of target species": "status_of_target_species",
         "status of target species": "status_of_target_species",
         "status": "status_of_target_species",
+        "target_status": "status_of_target_species",
     }
 
     for c in df.columns:
