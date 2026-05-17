@@ -396,7 +396,7 @@ def train_model(df: pd.DataFrame, target_col: str):
         "gear_type": col_options("gear_type", ["line", "net", "trap"]),
         "uses_bycatch_reduction_devices": col_options("uses_bycatch_reduction_devices", ["no", "yes"]),
         "enforcement_level": col_options("enforcement_level", ["low", "medium", "high"]),
-        "status_of_target_species": col_options("status_of_target_species", ["healthy", "declining", "overfished"]),
+        "status_of_target_species": col_options("status_of_target_species", ["abundant", "vulnerable"]),
     }
 
     return clf, acc, options
