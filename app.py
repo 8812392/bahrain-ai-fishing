@@ -530,11 +530,11 @@ with left:
 
     catch_per_trip_kg = st.slider("Catch per trip (kg)", min_value=0, max_value=500, value=120, step=5)
 
-  status_of_target_species = st.selectbox(
-    "Status of target species",
-    ["abundant", "vulnerable"],
-    index=0,
-)
+    status_of_target_species = st.selectbox(
+        "Status of target species",
+        ["abundant", "vulnerable"],
+        index=0,
+    )
 
     st.write("")
 
