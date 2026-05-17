@@ -534,7 +534,7 @@ with left:
     "Status of target species",
     ["abundant", "vulnerable"],
     index=0,
-    )
+)
 
     st.write("")
 
